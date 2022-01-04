@@ -61,7 +61,7 @@ L.MaidenheadConfWorked = L.LayerGroup.extend({
                         var regular = new RegExp(`^${gridLocator}`);
                         if ( grids_confirmed.some(e => regular.test(e)))
 			{
-                            this.addLayer(L.rectangle(bounds, {color: 'rgba(144,238,144, 0.6)', weight: 1, fillOpacity: 1, fill:true, interactive: false}));
+                            this.addLayer(L.rectangle(bounds, {color: 'rgba(0,247,140, 0.8)', weight: 1, fillOpacity: 1, fill:true, interactive: false}));
                         }
                         else
                         {
