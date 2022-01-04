@@ -2,7 +2,7 @@
  * L.Maidenhead displays a Maidenhead Locator of lines on the map.
  */
 
-L.MaidenheadConfWorked. = L.LayerGroup.extend({
+L.MaidenheadConfWorked = L.LayerGroup.extend({
 
 	
 	options: {
