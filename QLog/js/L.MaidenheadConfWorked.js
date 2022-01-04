@@ -57,7 +57,8 @@ L.MaidenheadConfWorked = L.LayerGroup.extend({
 			for (var lat = bottom; lat < top; lat += unit) {
 			var bounds = [[lat,lon],[lat+unit,lon+(unit*2)]];
                         var gridLabel = this._getLabel(lon+unit-(unit/lcor),lat+(unit/2)+(unit/lcor*c));
-                        var regular = new RegExp(`^${gridLabel}`);
+                        var gridLocator = this._getLocator(lon+unit-(unit/lcor),lat+(unit/2)+(unit/lcor*c));
+                        var regular = new RegExp(`^${gridLocator}`);
                         if ( grids_confirmed.some(e => regular.test(e)))
 			{
                             this.addLayer(L.rectangle(bounds, {color: 'rgba(144,238,144, 0.6)', weight: 1, fillOpacity: 1, fill:true, interactive: false}));
