@@ -117,7 +117,7 @@ L.MaidenheadConfWorked = L.LayerGroup.extend({
 
 });
 
-L.maidenheadConfWorked. = function (options) {
+L.maidenheadConfWorked = function (options) {
 	return new L.MaidenheadConfWorked.(options);
 };
 
