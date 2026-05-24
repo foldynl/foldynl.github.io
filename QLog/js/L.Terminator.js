@@ -169,6 +169,7 @@
 		initialize: function (options) {
 			this.version = '0.1.0';
 			this._polygons = [];
+			this._boundaries = [];
 			L.Util.setOptions(this, options);
 			this.options.resolution = positiveClampedNumber(this.options.resolution, 2, MAX_RESOLUTION);
 			this.options.longitudeRange = positiveClampedNumber(
@@ -196,9 +197,9 @@
 
 		setStyle: function (style) {
 			L.Util.extend(this.options, style);
-			this.eachLayer(function (layer) {
-				layer.setStyle(style);
-			});
+			if (this._solarContext) {
+				this._render(this._solarContext);
+			}
 			return this;
 		},
 
@@ -278,23 +279,59 @@
 
 		_render: function (context) {
 			var rings = this._compute(context);
+			var fillOptions = this._fillOptions();
+			var boundaryOptions = this._boundaryOptions();
 
 			for (var i = 0; i < rings.length; i++) {
 				var latLngs = this._filledRings(rings[i]);
 
 				if (this._polygons[i]) {
 					this._polygons[i].setLatLngs(latLngs);
+					this._polygons[i].setStyle(fillOptions);
 				} else {
-					this._polygons[i] = L.polygon(latLngs, this.options);
+					this._polygons[i] = L.polygon(latLngs, fillOptions);
 					this.addLayer(this._polygons[i]);
+				}
+
+				if (boundaryOptions) {
+					if (this._boundaries[i]) {
+						this._boundaries[i].setLatLngs(rings[i]);
+						this._boundaries[i].setStyle(boundaryOptions);
+					} else {
+						this._boundaries[i] = L.polyline(rings[i], boundaryOptions);
+						this.addLayer(this._boundaries[i]);
+					}
+				} else if (this._boundaries[i]) {
+					this.removeLayer(this._boundaries[i]);
+					this._boundaries[i] = null;
 				}
 			}
 
 			for (var j = rings.length; j < this._polygons.length; j++) {
 				this.removeLayer(this._polygons[j]);
+				if (this._boundaries[j]) {
+					this.removeLayer(this._boundaries[j]);
+				}
 			}
 
 			this._polygons.length = rings.length;
+			this._boundaries.length = rings.length;
+		},
+
+		_fillOptions: function () {
+			return L.Util.extend({}, this.options, {
+				stroke: false
+			});
+		},
+
+		_boundaryOptions: function () {
+			if (this.options.stroke === false) {
+				return null;
+			}
+
+			return L.Util.extend({}, this.options, {
+				fill: false
+			});
 		},
 
 		redraw: function () {
