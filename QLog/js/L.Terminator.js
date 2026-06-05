@@ -10,6 +10,7 @@
 	var D2R = Math.PI / 180;
 	var MAX_RESOLUTION = 10;
 	var MAX_LONGITUDE_RANGE = 1440;
+	var EPSILON = 1e-9;
 
 	function julian(date) {
 		/* Calculate the present UTC Julian Date. Function is valid after
@@ -344,13 +345,20 @@
 		},
 
 		_filledRings: function (ring) {
+			var northPoleDark = this._isPoleDark(90);
+			var southPoleDark = this._isPoleDark(-90);
+
+			if (!northPoleDark && !southPoleDark) {
+				return [ring];
+			}
+
 			var bounds = this._ringBounds(ring);
 			var filledRings = [
 				this._outerRing(bounds),
 				ring
 			];
 
-			if (!this._isPoleDark(90)) {
+			if (!northPoleDark) {
 				filledRings.push([
 					[bounds.maxLat, bounds.minLng],
 					[bounds.maxLat, bounds.maxLng],
@@ -359,7 +367,7 @@
 				]);
 			}
 
-			if (!this._isPoleDark(-90)) {
+			if (!southPoleDark) {
 				filledRings.push([
 					[-90, bounds.minLng],
 					[-90, bounds.maxLng],
@@ -403,10 +411,10 @@
 
 		_isPoleDark: function (lat) {
 			if (lat > 0) {
-				return this._lastSunDeclination <= -this.options.solarDepression;
+				return this._lastSunDeclination < -this.options.solarDepression - EPSILON;
 			}
 
-			return this._lastSunDeclination >= this.options.solarDepression;
+			return this._lastSunDeclination > this.options.solarDepression + EPSILON;
 		}
 	});
 
